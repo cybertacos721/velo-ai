@@ -1,0 +1,1394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Velo AI — Life Intelligence</title>
+<link href="https://fonts.googleapis.com/css2?family=Cabinet+Grotesk:wght@400;500;700;800;900&family=Instrument+Serif:ital@0;1&family=Geist+Mono:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#05080c;--s1:#0a0f15;--s2:#0f151d;--s3:#151d28;--s4:#1c2636;
+  --border:rgba(255,255,255,0.06);--border2:rgba(255,255,255,0.1);--border3:rgba(255,255,255,0.16);
+  --a1:#7fffcf;--a2:#3b9eff;--a3:#ff6f3c;--a4:#c77dff;--gold:#ffd166;
+  --text:#e8f0fa;--muted:#4a5a6e;--muted2:#7a90a8;--muted3:#adc0d4;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:'Cabinet Grotesk',sans-serif;min-height:100vh;overflow-x:hidden;cursor:default;}
+
+/* ── NOISE GRAIN ── */
+body::after{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:9999;opacity:.4;}
+
+/* ── AMBIENT ORBS ── */
+.orbs{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden;}
+.orb{position:absolute;border-radius:50%;filter:blur(120px);animation:orb-drift 20s ease-in-out infinite;}
+.o1{width:700px;height:700px;background:radial-gradient(circle,rgba(123,255,207,0.07),transparent 70%);top:-200px;left:-200px;animation-delay:0s;}
+.o2{width:500px;height:500px;background:radial-gradient(circle,rgba(59,158,255,0.06),transparent 70%);bottom:-100px;right:-100px;animation-delay:-7s;}
+.o3{width:400px;height:400px;background:radial-gradient(circle,rgba(199,125,255,0.05),transparent 70%);top:40%;left:60%;animation-delay:-14s;}
+@keyframes orb-drift{0%,100%{transform:translate(0,0) scale(1);}33%{transform:translate(30px,-40px) scale(1.05);}66%{transform:translate(-20px,30px) scale(.97);}  }
+
+/* ── GRID ── */
+.grid-bg{position:fixed;inset:0;pointer-events:none;z-index:0;background-image:linear-gradient(rgba(123,255,207,0.02) 1px,transparent 1px),linear-gradient(90deg,rgba(123,255,207,0.02) 1px,transparent 1px);background-size:60px 60px;}
+
+/* ── PAGES ── */
+.page{display:none;position:relative;z-index:1;}.page.active{display:block;}
+
+/* ══════════════════════════════════════
+   LANDING
+══════════════════════════════════════ */
+#landing{min-height:100vh;}
+
+/* NAV */
+.nav{display:flex;align-items:center;justify-content:space-between;padding:20px 48px;position:sticky;top:0;z-index:200;background:rgba(5,8,12,.8);backdrop-filter:blur(24px);border-bottom:1px solid var(--border);}
+.logo{display:flex;align-items:center;gap:10px;font-size:20px;font-weight:900;letter-spacing:-.5px;cursor:pointer;}
+.logo-gem{width:34px;height:34px;background:linear-gradient(135deg,var(--a1),var(--a2));border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;box-shadow:0 0 20px rgba(123,255,207,.25);}
+.logo em{color:var(--a1);font-style:normal;}
+.nav-r{display:flex;align-items:center;gap:10px;}
+.nbtn{padding:8px 20px;border-radius:10px;border:none;cursor:pointer;font-family:'Cabinet Grotesk',sans-serif;font-size:13px;font-weight:700;transition:all .2s;}
+.nbtn-ghost{background:transparent;border:1px solid var(--border2);color:var(--muted3);}.nbtn-ghost:hover{border-color:var(--a1);color:var(--a1);}
+.nbtn-solid{background:linear-gradient(135deg,var(--a1),#00d488);color:#000;}.nbtn-solid:hover{transform:translateY(-1px);box-shadow:0 8px 28px rgba(123,255,207,.3);}
+
+/* HERO */
+.hero{max-width:1000px;margin:0 auto;padding:100px 48px 70px;text-align:center;}
+.hero-eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--a1);background:rgba(123,255,207,.07);border:1px solid rgba(123,255,207,.15);padding:7px 18px;border-radius:40px;margin-bottom:32px;}
+.live-dot{width:7px;height:7px;background:var(--a1);border-radius:50%;animation:blink 2s infinite;}
+@keyframes blink{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(123,255,207,.4);}50%{opacity:.6;box-shadow:0 0 0 5px rgba(123,255,207,0);}}
+
+.hero h1{font-size:clamp(44px,7vw,82px);font-weight:900;line-height:1.0;letter-spacing:-3px;margin-bottom:28px;}
+.hero h1 .serif{font-family:'Instrument Serif',serif;font-style:italic;color:var(--a1);letter-spacing:-2px;}
+.hero h1 .dim{color:var(--muted2);}
+.hero-sub{font-size:18px;color:var(--muted3);max-width:560px;margin:0 auto 20px;line-height:1.65;font-weight:400;}
+.hero-proof{display:flex;align-items:center;justify-content:center;gap:20px;margin-bottom:44px;flex-wrap:wrap;}
+.proof-item{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--muted2);}
+.proof-item strong{color:var(--muted3);}
+.proof-sep{width:3px;height:3px;background:var(--muted);border-radius:50%;}
+.hero-ctas{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-bottom:60px;}
+.cta-main{display:flex;align-items:center;gap:9px;background:linear-gradient(135deg,var(--a1),#00d488);color:#000;padding:16px 34px;border-radius:14px;border:none;cursor:pointer;font-family:'Cabinet Grotesk',sans-serif;font-size:16px;font-weight:800;transition:all .25s;box-shadow:0 4px 24px rgba(123,255,207,.2);}
+.cta-main:hover{transform:translateY(-2px);box-shadow:0 12px 40px rgba(123,255,207,.35);}
+.cta-out{display:flex;align-items:center;gap:9px;background:transparent;color:var(--muted3);padding:16px 30px;border-radius:14px;border:1px solid var(--border3);cursor:pointer;font-family:'Cabinet Grotesk',sans-serif;font-size:15px;font-weight:700;transition:all .2s;}
+.cta-out:hover{border-color:var(--a2);color:var(--a2);}
+
+/* FEATURE SHOWCASE */
+.showcase{max-width:1100px;margin:0 auto;padding:0 48px 100px;}
+.sec-eyebrow{text-align:center;font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-bottom:14px;}
+.sec-title{text-align:center;font-family:'Cabinet Grotesk',sans-serif;font-size:clamp(28px,4vw,44px);font-weight:900;letter-spacing:-1.5px;margin-bottom:56px;line-height:1.1;}
+.sec-title em{font-family:'Instrument Serif',serif;font-style:italic;color:var(--a1);}
+
+/* Feature cards — asymmetric grid */
+.feat-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;}
+.feat-card{background:var(--s1);border:1px solid var(--border);border-radius:20px;padding:28px;transition:all .3s;position:relative;overflow:hidden;}
+.feat-card::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 20% 20%,rgba(123,255,207,.04),transparent 60%);pointer-events:none;}
+.feat-card:hover{border-color:rgba(123,255,207,.18);transform:translateY(-4px);box-shadow:0 20px 40px rgba(0,0,0,.3);}
+.feat-card.wide{grid-column:span 2;}
+.feat-card.tall{grid-row:span 2;}
+.feat-tag{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--a1);background:rgba(123,255,207,.08);border:1px solid rgba(123,255,207,.15);padding:4px 10px;border-radius:20px;margin-bottom:16px;}
+.feat-tag.blue{color:var(--a2);background:rgba(59,158,255,.08);border-color:rgba(59,158,255,.15);}
+.feat-tag.purple{color:var(--a4);background:rgba(199,125,255,.08);border-color:rgba(199,125,255,.15);}
+.feat-tag.orange{color:var(--a3);background:rgba(255,111,60,.08);border-color:rgba(255,111,60,.15);}
+.feat-tag.gold{color:var(--gold);background:rgba(255,209,102,.08);border-color:rgba(255,209,102,.15);}
+.feat-h{font-size:20px;font-weight:800;margin-bottom:10px;letter-spacing:-.5px;}
+.feat-p{font-size:14px;color:var(--muted2);line-height:1.65;font-weight:400;}
+.feat-preview{margin-top:20px;background:var(--s2);border:1px solid var(--border);border-radius:12px;padding:16px;font-size:12px;}
+.feat-preview .fp-label{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:10px;}
+/* radar mini */
+.radar-mini{display:flex;gap:8px;flex-wrap:wrap;}
+.radar-mini .rm-item{flex:1;min-width:80px;background:var(--s3);border-radius:8px;padding:10px;text-align:center;}
+.rm-bar-wrap{width:100%;height:3px;background:var(--s4);border-radius:2px;margin-bottom:6px;overflow:hidden;}
+.rm-bar{height:100%;border-radius:2px;background:var(--a1);}
+.rm-label{font-size:10px;color:var(--muted2);}
+.rm-val{font-size:13px;font-weight:700;color:var(--text);}
+/* score ring mini */
+.score-ring-mini{display:flex;align-items:center;gap:16px;}
+.ring-svg{width:70px;height:70px;}
+.ring-info h4{font-size:28px;font-weight:900;letter-spacing:-1px;color:var(--a1);}
+.ring-info p{font-size:12px;color:var(--muted2);}
+/* briefing mini */
+.brief-item{display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);}
+.brief-item:last-child{border:none;}
+.brief-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:4px;}
+.brief-text{font-size:12px;color:var(--muted3);line-height:1.5;}
+/* streak mini */
+.streak-row{display:flex;gap:4px;}
+.streak-day{width:26px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:var(--muted);}
+.streak-day.done{background:rgba(123,255,207,.15);color:var(--a1);}
+.streak-day.today{background:var(--a1);color:#000;}
+
+/* PRICING */
+.pricing-wrap{max-width:960px;margin:0 auto;padding:0 48px 100px;}
+.pricing-toggle{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:44px;}
+.toggle-opt{font-size:14px;font-weight:700;color:var(--muted2);cursor:pointer;transition:.2s;}
+.toggle-opt.on{color:var(--text);}
+.toggle-pill{width:44px;height:24px;background:var(--a1);border-radius:12px;position:relative;cursor:pointer;}
+.toggle-thumb{width:18px;height:18px;background:#000;border-radius:50%;position:absolute;top:3px;left:3px;transition:transform .25s;}
+.toggle-thumb.right{transform:translateX(20px);}
+.save-badge{background:rgba(123,255,207,.12);color:var(--a1);font-size:11px;font-weight:700;padding:3px 8px;border-radius:6px;}
+.p-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;}
+.p-card{background:var(--s1);border:1px solid var(--border);border-radius:22px;padding:32px;position:relative;transition:all .3s;}
+.p-card.hot{border-color:rgba(123,255,207,.3);background:linear-gradient(160deg,rgba(123,255,207,.04),var(--s1));}
+.p-card.hot::before{content:'';position:absolute;inset:-1px;border-radius:23px;background:linear-gradient(135deg,rgba(123,255,207,.3),transparent,rgba(59,158,255,.2));z-index:-1;}
+.p-hotlabel{position:absolute;top:-13px;left:50%;transform:translateX(-50%);background:linear-gradient(90deg,var(--a1),#00d488);color:#000;font-size:10px;font-weight:800;letter-spacing:1px;text-transform:uppercase;padding:4px 16px;border-radius:20px;white-space:nowrap;}
+.p-name{font-size:16px;font-weight:800;margin-bottom:8px;}
+.p-price-row{display:flex;align-items:baseline;gap:2px;margin-bottom:4px;}
+.p-price{font-size:42px;font-weight:900;letter-spacing:-2px;}
+.p-price sup{font-size:18px;letter-spacing:0;vertical-align:super;}
+.p-price sub{font-size:14px;color:var(--muted2);font-weight:500;letter-spacing:0;}
+.p-desc{font-size:13px;color:var(--muted2);margin-bottom:24px;line-height:1.5;}
+.p-feats{list-style:none;margin-bottom:28px;}
+.p-feats li{font-size:13px;color:var(--muted3);padding:7px 0;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;gap:9px;line-height:1.4;}
+.p-feats li:last-child{border:none;}
+.p-feats .ck{color:var(--a1);flex-shrink:0;font-weight:700;margin-top:1px;}
+.p-feats .xk{color:var(--muted);flex-shrink:0;margin-top:1px;}
+.p-btn{width:100%;padding:13px;border-radius:12px;border:none;cursor:pointer;font-family:'Cabinet Grotesk',sans-serif;font-size:14px;font-weight:800;letter-spacing:.3px;transition:all .2s;}
+.pb0{background:var(--s2);color:var(--text);border:1px solid var(--border3);}.pb0:hover{border-color:var(--a1);color:var(--a1);}
+.pb1{background:linear-gradient(135deg,var(--a1),#00d488);color:#000;}.pb1:hover{box-shadow:0 8px 28px rgba(123,255,207,.3);transform:translateY(-1px);}
+.pb2{background:linear-gradient(135deg,var(--gold),#ffb700);color:#000;}.pb2:hover{box-shadow:0 8px 28px rgba(255,209,102,.3);transform:translateY(-1px);}
+
+/* ══════════════════════════════════════
+   AUTH MODAL
+══════════════════════════════════════ */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(14px);z-index:1000;align-items:center;justify-content:center;padding:20px;}
+.overlay.open{display:flex;}
+.modal{background:var(--s1);border:1px solid var(--border3);border-radius:26px;padding:40px;width:100%;max-width:440px;position:relative;animation:mPop .3s cubic-bezier(.34,1.56,.64,1);}
+@keyframes mPop{from{opacity:0;transform:scale(.9) translateY(20px);}to{opacity:1;transform:scale(1) translateY(0);}}
+.m-close{position:absolute;top:14px;right:14px;background:var(--s2);border:none;color:var(--muted2);width:30px;height:30px;border-radius:8px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:.2s;}
+.m-close:hover{color:var(--text);}
+.m-logo{display:flex;align-items:center;gap:8px;font-size:17px;font-weight:900;margin-bottom:28px;}
+.m-logo em{color:var(--a1);font-style:normal;}
+.m-title{font-size:24px;font-weight:900;letter-spacing:-.8px;margin-bottom:5px;}
+.m-sub{font-size:13px;color:var(--muted2);margin-bottom:26px;}
+.err-box{background:rgba(255,111,60,.1);border:1px solid rgba(255,111,60,.25);color:#ffaa88;border-radius:9px;padding:11px 14px;font-size:13px;margin-bottom:14px;display:none;}
+.fg{margin-bottom:16px;}
+.fl{font-size:11px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;color:var(--muted2);margin-bottom:7px;display:block;}
+.fi{width:100%;background:var(--s2);border:1px solid var(--border2);border-radius:11px;padding:12px 16px;color:var(--text);font-family:'Cabinet Grotesk',sans-serif;font-size:14px;outline:none;transition:.2s;}
+.fi:focus{border-color:rgba(123,255,207,.4);box-shadow:0 0 0 3px rgba(123,255,207,.07);}
+.fi::placeholder{color:var(--muted);}
+.btn-sub{width:100%;background:linear-gradient(135deg,var(--a1),#00d488);color:#000;border:none;border-radius:12px;padding:14px;font-family:'Cabinet Grotesk',sans-serif;font-size:15px;font-weight:800;cursor:pointer;margin-top:4px;transition:.2s;}
+.btn-sub:hover{box-shadow:0 8px 28px rgba(123,255,207,.3);}
+.btn-sub:disabled{opacity:.45;cursor:not-allowed;}
+.auth-sw{text-align:center;margin-top:18px;font-size:13px;color:var(--muted2);}
+.auth-sw a{color:var(--a1);cursor:pointer;font-weight:700;}
+
+/* ══════════════════════════════════════
+   APP
+══════════════════════════════════════ */
+#app-page{min-height:100vh;}
+.app-shell{display:flex;height:100vh;overflow:hidden;}
+
+/* SIDEBAR */
+.sb{width:270px;flex-shrink:0;background:var(--s1);border-right:1px solid var(--border);display:flex;flex-direction:column;}
+.sb-top{padding:20px;border-bottom:1px solid var(--border);}
+.sb-logo{display:flex;align-items:center;gap:9px;font-size:17px;font-weight:900;letter-spacing:-.3px;}
+.sb-logo em{color:var(--a1);font-style:normal;}
+.sb-user{display:flex;align-items:center;gap:11px;background:var(--s2);border-radius:13px;padding:11px 12px;margin-top:14px;cursor:pointer;transition:.2s;border:1px solid var(--border);}
+.sb-user:hover{background:var(--s3);border-color:var(--border2);}
+.u-av{width:36px;height:36px;border-radius:11px;background:linear-gradient(135deg,var(--a1),var(--a2));display:flex;align-items:center;justify-content:center;font-weight:900;font-size:15px;color:#000;flex-shrink:0;}
+.u-name{font-size:13px;font-weight:800;color:var(--text);line-height:1;}
+.u-plan{font-size:11px;color:var(--muted2);margin-top:3px;display:flex;align-items:center;gap:5px;}
+.plan-pip{display:inline-block;width:6px;height:6px;border-radius:50%;}
+.pip-free{background:var(--muted);}.pip-pro{background:var(--a1);box-shadow:0 0 6px var(--a1);}.pip-elite{background:var(--gold);box-shadow:0 0 6px var(--gold);}
+
+.sb-body{flex:1;overflow-y:auto;padding:16px;}
+.sb-sec{font-size:10px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:var(--muted);padding:0 8px;margin:16px 0 8px;}
+.sb-sec:first-child{margin-top:0;}
+.sb-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:10px;cursor:pointer;transition:.2s;font-size:13px;color:var(--muted2);font-weight:600;position:relative;}
+.sb-item:hover,.sb-item.on{background:rgba(123,255,207,.07);color:var(--a1);}
+.sb-item .si{font-size:16px;flex-shrink:0;}
+.sb-item .new-badge{margin-left:auto;font-size:9px;font-weight:800;background:var(--a1);color:#000;padding:2px 6px;border-radius:5px;letter-spacing:.5px;}
+.sb-item .pro-badge{margin-left:auto;font-size:9px;font-weight:800;background:rgba(123,255,207,.15);color:var(--a1);padding:2px 7px;border-radius:5px;}
+.sb-item .elite-badge{margin-left:auto;font-size:9px;font-weight:800;background:rgba(255,209,102,.15);color:var(--gold);padding:2px 7px;border-radius:5px;}
+.sb-item .notif{margin-left:auto;min-width:18px;height:18px;background:var(--a3);border-radius:9px;font-size:10px;font-weight:800;color:#fff;display:flex;align-items:center;justify-content:center;padding:0 4px;}
+
+.sb-score-card{margin:14px 10px;background:linear-gradient(135deg,rgba(123,255,207,.07),rgba(59,158,255,.05));border:1px solid rgba(123,255,207,.15);border-radius:14px;padding:14px;cursor:pointer;transition:.2s;}
+.sb-score-card:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(0,0,0,.3);}
+.sb-score-card .sc-label{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--a1);margin-bottom:8px;}
+.sc-bar-row{display:flex;align-items:center;gap:8px;}
+.sc-bar{flex:1;height:5px;background:var(--s3);border-radius:3px;overflow:hidden;}
+.sc-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--a1),var(--a2));transition:width 1s ease;}
+.sc-num{font-size:20px;font-weight:900;color:var(--a1);letter-spacing:-1px;}
+
+.sb-upg{padding:16px;border-top:1px solid var(--border);}
+.upg-card{background:linear-gradient(135deg,rgba(123,255,207,.08),rgba(59,158,255,.05));border:1px solid rgba(123,255,207,.18);border-radius:13px;padding:14px;cursor:pointer;transition:.2s;}
+.upg-card:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(0,0,0,.3);}
+.upg-card h4{font-size:13px;font-weight:800;color:var(--a1);margin-bottom:4px;}
+.upg-card p{font-size:11px;color:var(--muted2);line-height:1.4;}
+
+/* MAIN */
+.app-main{flex:1;overflow-y:auto;display:flex;flex-direction:column;background:var(--bg);}
+.app-bar{display:flex;align-items:center;justify-content:space-between;padding:16px 32px;border-bottom:1px solid var(--border);background:rgba(5,8,12,.7);backdrop-filter:blur(14px);flex-shrink:0;position:sticky;top:0;z-index:50;}
+.app-bar h1{font-size:20px;font-weight:900;letter-spacing:-.6px;}
+.bar-right{display:flex;align-items:center;gap:12px;}
+.usage-chip{display:flex;align-items:center;gap:8px;background:var(--s2);border:1px solid var(--border);border-radius:20px;padding:6px 14px;}
+.uc-label{font-size:12px;color:var(--muted2);}
+.uc-bar{width:80px;height:3px;background:var(--s3);border-radius:2px;overflow:hidden;}
+.uc-fill{height:100%;border-radius:2px;background:linear-gradient(90deg,var(--a1),var(--a2));transition:width .5s;}
+.uc-fill.warn{background:linear-gradient(90deg,var(--a3),#ff3300);}
+.streak-chip{display:flex;align-items:center;gap:6px;background:rgba(255,209,102,.06);border:1px solid rgba(255,209,102,.15);border-radius:20px;padding:6px 14px;font-size:12px;font-weight:700;color:var(--gold);}
+
+/* APP CONTENT */
+.app-content{flex:1;padding:28px 32px;max-width:900px;width:100%;margin:0 auto;}
+
+/* ── MOOD CHECK-IN BANNER ── */
+.mood-banner{background:linear-gradient(135deg,rgba(123,255,207,.05),rgba(59,158,255,.04));border:1px solid rgba(123,255,207,.12);border-radius:18px;padding:18px 22px;margin-bottom:24px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;animation:slideIn .4s ease;}
+@keyframes slideIn{from{opacity:0;transform:translateY(-10px);}to{opacity:1;transform:translateY(0);}}
+.mood-banner .mb-title{font-size:13px;font-weight:800;color:var(--text);margin-bottom:3px;}
+.mood-banner .mb-sub{font-size:12px;color:var(--muted2);}
+.mood-emojis{display:flex;gap:8px;margin-left:auto;}
+.m-emoji{width:38px;height:38px;border-radius:10px;background:var(--s2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer;transition:.2s;}
+.m-emoji:hover{background:rgba(123,255,207,.1);border-color:var(--a1);transform:scale(1.15);}
+.m-emoji.sel{background:rgba(123,255,207,.15);border-color:var(--a1);transform:scale(1.1);}
+.mood-dismiss{background:transparent;border:none;color:var(--muted);cursor:pointer;font-size:16px;margin-left:8px;}
+
+/* ── DAILY BRIEFING ── */
+.briefing-card{background:var(--s1);border:1px solid var(--border);border-radius:18px;padding:20px 22px;margin-bottom:24px;animation:slideIn .4s .05s ease both;}
+.bc-header{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
+.bc-icon{width:36px;height:36px;background:linear-gradient(135deg,rgba(255,209,102,.15),rgba(255,111,60,.1));border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:17px;}
+.bc-meta h3{font-size:14px;font-weight:800;color:var(--text);}
+.bc-meta p{font-size:11px;color:var(--muted2);}
+.bc-dismiss{margin-left:auto;background:transparent;border:none;color:var(--muted);cursor:pointer;font-size:15px;}
+.briefing-items{display:flex;flex-direction:column;gap:8px;}
+.bi-item{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;background:var(--s2);border-radius:10px;cursor:pointer;transition:.2s;border:1px solid var(--border);}
+.bi-item:hover{border-color:rgba(123,255,207,.2);background:var(--s3);}
+.bi-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:4px;}
+.bi-text{font-size:13px;color:var(--muted3);line-height:1.4;}
+.bi-arrow{margin-left:auto;color:var(--muted);font-size:14px;flex-shrink:0;}
+
+/* ── CAT STRIP ── */
+.cat-scroll{display:flex;gap:8px;margin-bottom:22px;overflow-x:auto;padding-bottom:4px;-webkit-overflow-scrolling:touch;}
+.cat-scroll::-webkit-scrollbar{display:none;}
+.cc{display:flex;align-items:center;gap:6px;padding:8px 16px;border-radius:30px;border:1px solid var(--border);background:var(--s1);font-size:13px;font-weight:700;color:var(--muted2);cursor:pointer;transition:.2s;white-space:nowrap;flex-shrink:0;}
+.cc:hover,.cc.on{background:rgba(123,255,207,.08);border-color:rgba(123,255,207,.25);color:var(--a1);}
+
+/* ── QUICK PROMPTS ── */
+.qp-row{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:20px;}
+.qp{padding:7px 14px;background:var(--s1);border:1px solid var(--border);border-radius:8px;font-size:12px;font-weight:600;color:var(--muted2);cursor:pointer;transition:.2s;}
+.qp:hover{border-color:rgba(123,255,207,.25);color:var(--text);background:var(--s2);}
+
+/* ── INPUT ZONE ── */
+.input-card{background:var(--s1);border:1px solid var(--border);border-radius:20px;transition:border-color .3s,box-shadow .3s;position:relative;}
+.input-card:focus-within{border-color:rgba(123,255,207,.3);box-shadow:0 0 0 4px rgba(123,255,207,.05);}
+.ic-top{padding:20px 22px 0;}
+.ic-label{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:10px;display:flex;align-items:center;gap:6px;}
+.ic-label .cat-indicator{background:rgba(123,255,207,.1);color:var(--a1);padding:2px 8px;border-radius:5px;font-size:9px;}
+textarea{width:100%;background:transparent;border:none;outline:none;color:var(--text);font-family:'Cabinet Grotesk',sans-serif;font-size:15px;line-height:1.7;resize:none;min-height:90px;font-weight:400;}
+textarea::placeholder{color:var(--muted);}
+.ic-bottom{display:flex;align-items:center;justify-content:space-between;padding:14px 22px;border-top:1px solid var(--border);flex-wrap:wrap;gap:10px;}
+.ic-meta{display:flex;align-items:center;gap:14px;}
+.ic-chars{font-size:12px;color:var(--muted);font-family:'Geist Mono',monospace;}
+.tone-select{background:var(--s2);border:1px solid var(--border);border-radius:7px;color:var(--muted2);font-family:'Cabinet Grotesk',sans-serif;font-size:12px;font-weight:600;padding:5px 10px;outline:none;cursor:pointer;}
+.tone-select:focus{border-color:rgba(123,255,207,.3);}
+.btn-ask{display:flex;align-items:center;gap:8px;background:linear-gradient(135deg,var(--a1),#00d488);color:#000;font-family:'Cabinet Grotesk',sans-serif;font-weight:800;font-size:14px;border:none;border-radius:11px;padding:11px 24px;cursor:pointer;transition:.2s;box-shadow:0 2px 12px rgba(123,255,207,.15);}
+.btn-ask:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(123,255,207,.3);}
+.btn-ask:disabled{opacity:.35;cursor:not-allowed;transform:none;box-shadow:none;}
+
+/* ── LIMIT BANNER ── */
+.limit-wrap{background:rgba(255,111,60,.06);border:1px solid rgba(255,111,60,.18);border-radius:15px;padding:16px 20px;margin-bottom:22px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+.lw-text h4{font-size:14px;font-weight:800;color:#ff9a7a;}
+.lw-text p{font-size:12px;color:var(--muted2);margin-top:2px;}
+.lw-btn{margin-left:auto;background:linear-gradient(135deg,var(--a1),#00d488);color:#000;border:none;border-radius:9px;padding:9px 18px;font-family:'Cabinet Grotesk',sans-serif;font-size:13px;font-weight:800;cursor:pointer;white-space:nowrap;}
+
+/* ── RESPONSE ── */
+.resp-card{background:var(--s1);border:1px solid var(--border);border-radius:20px;overflow:hidden;margin-bottom:20px;animation:fadeUp .45s cubic-bezier(.22,1,.36,1) both;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px);}to{opacity:1;transform:translateY(0);}}
+.resp-head{display:flex;align-items:center;gap:12px;padding:16px 22px;border-bottom:1px solid var(--border);background:var(--s2);}
+.ai-gem{width:36px;height:36px;background:linear-gradient(135deg,var(--a1),var(--a2));border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:0 0 16px rgba(123,255,207,.2);}
+.resp-meta{flex:1;}
+.resp-name{font-size:14px;font-weight:800;}
+.resp-tag{font-size:11px;color:var(--muted2);margin-top:1px;}
+.resp-actions{display:flex;gap:8px;}
+.r-action{background:var(--s3);border:1px solid var(--border);border-radius:8px;padding:6px 12px;font-size:12px;font-weight:700;color:var(--muted2);cursor:pointer;transition:.2s;font-family:'Cabinet Grotesk',sans-serif;}
+.r-action:hover{color:var(--a1);border-color:rgba(123,255,207,.2);}
+.resp-body{padding:24px 22px;font-size:14px;line-height:1.85;color:var(--muted3);font-weight:400;}
+.resp-body strong{color:var(--text);font-weight:700;}
+.resp-body h3{font-size:15px;font-weight:800;color:var(--text);margin:18px 0 8px;letter-spacing:-.3px;}
+.resp-body ul{padding:0;list-style:none;}
+.resp-body ul li{padding:6px 0 6px 20px;position:relative;border-bottom:1px solid var(--border);}
+.resp-body ul li:last-child{border:none;}
+.resp-body ul li::before{content:'→';position:absolute;left:0;color:var(--a1);font-weight:700;}
+.resp-body p{margin-bottom:10px;}.resp-body p:last-child{margin:0;}
+.tip-block{background:rgba(123,255,207,.04);border-left:3px solid var(--a1);border-radius:0 10px 10px 0;padding:12px 16px;margin:14px 0;font-size:13px;color:var(--muted2);}
+.tip-block strong{color:var(--a1);}
+/* Follow-ups */
+.followup-section{border-top:1px solid var(--border);padding:16px 22px;}
+.fu-label{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:10px;}
+.fu-chips{display:flex;flex-wrap:wrap;gap:7px;}
+.fu-chip{background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:7px 13px;font-size:12px;font-weight:600;color:var(--muted3);cursor:pointer;transition:.2s;font-family:'Cabinet Grotesk',sans-serif;}
+.fu-chip:hover{border-color:rgba(123,255,207,.25);color:var(--a1);background:rgba(123,255,207,.05);}
+
+/* ── LOADING ── */
+.loading-card{background:var(--s1);border:1px solid var(--border);border-radius:20px;padding:48px;text-align:center;}
+.ldots{display:flex;gap:6px;justify-content:center;margin-bottom:14px;}
+.ldots span{width:8px;height:8px;border-radius:50%;background:var(--a1);animation:ldot 1.4s infinite;}
+.ldots span:nth-child(2){animation-delay:.2s;background:var(--a2);}
+.ldots span:nth-child(3){animation-delay:.4s;background:var(--a4);}
+@keyframes ldot{0%,80%,100%{transform:scale(.5);opacity:.3;}40%{transform:scale(1);opacity:1;}}
+.lt{font-size:13px;color:var(--muted2);font-weight:400;line-height:1.6;font-family:'Geist Mono',monospace;}
+.lt em{color:var(--a1);font-style:normal;}
+
+/* ── VELO SCORE PAGE ── */
+.score-page{max-width:700px;margin:0 auto;}
+.score-hero{background:var(--s1);border:1px solid var(--border);border-radius:22px;padding:36px;text-align:center;margin-bottom:24px;position:relative;overflow:hidden;}
+.score-hero::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 50% 0%,rgba(123,255,207,.06),transparent 60%);}
+.score-ring-wrap{position:relative;display:inline-block;margin-bottom:20px;}
+.score-ring-wrap svg{display:block;}
+.score-num{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:44px;font-weight:900;letter-spacing:-2px;color:var(--a1);}
+.score-label-main{font-size:22px;font-weight:900;letter-spacing:-.8px;margin-bottom:6px;}
+.score-sub{font-size:14px;color:var(--muted2);max-width:340px;margin:0 auto;}
+.radar-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px;}
+.rg-card{background:var(--s1);border:1px solid var(--border);border-radius:14px;padding:16px;transition:.2s;}
+.rg-card:hover{border-color:rgba(123,255,207,.18);transform:translateY(-2px);}
+.rg-icon{font-size:22px;margin-bottom:10px;}
+.rg-name{font-size:12px;font-weight:700;color:var(--muted2);margin-bottom:6px;letter-spacing:.3px;}
+.rg-bar{width:100%;height:4px;background:var(--s3);border-radius:2px;overflow:hidden;margin-bottom:6px;}
+.rg-fill{height:100%;border-radius:2px;}
+.rg-val{font-size:18px;font-weight:900;letter-spacing:-.5px;}
+.score-cta{background:linear-gradient(135deg,rgba(123,255,207,.07),rgba(59,158,255,.04));border:1px solid rgba(123,255,207,.15);border-radius:16px;padding:20px 24px;display:flex;align-items:center;gap:16px;}
+.sc-cta-text h4{font-size:15px;font-weight:800;margin-bottom:4px;}
+.sc-cta-text p{font-size:13px;color:var(--muted2);}
+.sc-cta-btn{margin-left:auto;background:linear-gradient(135deg,var(--a1),#00d488);color:#000;border:none;border-radius:10px;padding:10px 20px;font-family:'Cabinet Grotesk',sans-serif;font-size:13px;font-weight:800;cursor:pointer;white-space:nowrap;}
+
+/* ── HISTORY PAGE ── */
+.hist-page{max-width:700px;margin:0 auto;}
+.h-item{display:flex;align-items:flex-start;gap:12px;background:var(--s1);border:1px solid var(--border);border-radius:13px;padding:14px 16px;cursor:pointer;transition:.2s;margin-bottom:8px;}
+.h-item:hover{border-color:rgba(123,255,207,.18);background:var(--s2);}
+.h-ic{width:32px;height:32px;border-radius:9px;background:var(--s2);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+.h-q{font-size:13px;color:var(--text);font-weight:700;line-height:1.4;}
+.h-c{font-size:11px;color:var(--muted);margin-top:3px;text-transform:uppercase;letter-spacing:.5px;font-weight:600;}
+.h-t{margin-left:auto;font-size:11px;color:var(--muted);flex-shrink:0;padding-top:2px;font-family:'Geist Mono',monospace;}
+
+/* ── SETTINGS ── */
+.settings-page{max-width:600px;margin:0 auto;}
+.stg-card{background:var(--s1);border:1px solid var(--border);border-radius:16px;padding:24px;margin-bottom:18px;}
+.stg-card h3{font-size:15px;font-weight:800;margin-bottom:18px;display:flex;align-items:center;gap:8px;letter-spacing:-.3px;}
+.stg-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);}
+.stg-row:last-child{border:none;}
+.stg-k{font-size:13px;color:var(--muted2);font-weight:500;}
+.stg-v{font-size:13px;color:var(--text);font-weight:700;}
+.tp{display:inline-flex;align-items:center;font-size:11px;font-weight:800;padding:3px 10px;border-radius:20px;}
+.tp-free{background:rgba(74,90,110,.3);color:var(--muted3);}
+.tp-pro{background:rgba(123,255,207,.12);color:var(--a1);}
+.tp-elite{background:rgba(255,209,102,.12);color:var(--gold);}
+.btn-danger{background:rgba(255,111,60,.09);border:1px solid rgba(255,111,60,.2);color:#ff9a7a;border-radius:9px;padding:8px 16px;cursor:pointer;font-family:'Cabinet Grotesk',sans-serif;font-size:13px;font-weight:700;transition:.2s;}
+.btn-danger:hover{background:rgba(255,111,60,.18);}
+.btn-acc{background:rgba(123,255,207,.08);border:1px solid rgba(123,255,207,.2);color:var(--a1);border-radius:9px;padding:8px 16px;cursor:pointer;font-family:'Cabinet Grotesk',sans-serif;font-size:13px;font-weight:700;transition:.2s;}
+.btn-acc:hover{background:rgba(123,255,207,.15);}
+
+/* ── SESSION HISTORY ── */
+.sess-hist{margin-top:24px;}
+.sh-title{font-size:14px;font-weight:800;margin-bottom:12px;color:var(--muted3);letter-spacing:-.3px;}
+
+/* ── PAYMENT MODAL ── */
+.pay-modal{max-width:480px;}
+.plan-preview{background:var(--s2);border:1px solid var(--border2);border-radius:13px;padding:16px 18px;margin-bottom:20px;}
+.pp-name{font-size:15px;font-weight:800;margin-bottom:4px;}
+.pp-price{font-size:30px;font-weight:900;letter-spacing:-1.5px;}
+.pp-price.gold-p{color:var(--gold);}
+.pp-price sup{font-size:15px;vertical-align:super;letter-spacing:0;}
+.pp-price sub{font-size:13px;color:var(--muted2);font-weight:500;letter-spacing:0;}
+.card-row{display:flex;gap:12px;}.card-row .fg{flex:1;}
+.pay-secure{text-align:center;font-size:11px;color:var(--muted);margin-top:9px;}
+.pay-secure span{color:var(--a1);}
+.success-wrap{text-align:center;padding:14px 0;}
+.sw-icon{font-size:52px;margin-bottom:16px;}
+.success-wrap h3{font-size:24px;font-weight:900;letter-spacing:-1px;margin-bottom:8px;}
+.success-wrap p{font-size:14px;color:var(--muted2);}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--s1);border:1px solid rgba(123,255,207,.25);border-radius:13px;padding:14px 20px;font-size:13px;color:var(--text);z-index:9999;display:flex;align-items:center;gap:10px;box-shadow:0 8px 40px rgba(0,0,0,.5);transform:translateY(80px);opacity:0;transition:all .35s cubic-bezier(.34,1.56,.64,1);font-weight:600;}
+.toast.show{transform:translateY(0);opacity:1;}
+
+/* ── API ERR ── */
+.api-err{background:rgba(255,111,60,.09);border:1px solid rgba(255,111,60,.2);color:#ffaa88;border-radius:13px;padding:14px 18px;font-size:14px;margin-bottom:20px;}
+
+::-webkit-scrollbar{width:5px;}::-webkit-scrollbar-track{background:transparent;}::-webkit-scrollbar-thumb{background:var(--s3);border-radius:3px;}
+@media(max-width:720px){.sb{position:fixed;left:0;top:0;bottom:0;z-index:200;transform:translateX(-100%);}.sb.open{transform:translateX(0);}.nav{padding:14px 18px;}.hero{padding:60px 20px 50px;}.showcase,.pricing-wrap{padding-left:18px;padding-right:18px;}.app-content{padding:16px;}.p-grid{grid-template-columns:1fr;}.feat-grid{grid-template-columns:1fr;}.feat-card.wide{grid-column:span 1;}}
+</style>
+</head>
+<body>
+<div class="orbs"><div class="orb o1"></div><div class="orb o2"></div><div class="orb o3"></div></div>
+<div class="grid-bg"></div>
+
+<!-- ═══════════ LANDING ═══════════ -->
+<div id="landing" class="page active">
+  <nav class="nav">
+    <div class="logo"><div class="logo-gem">⚡</div>Velo <em>AI</em></div>
+    <div class="nav-r">
+      <button class="nbtn nbtn-ghost" onclick="openAuth('login')">Sign In</button>
+      <button class="nbtn nbtn-solid" onclick="openAuth('signup')">Get Started Free</button>
+    </div>
+  </nav>
+
+  <div class="hero">
+    <div class="hero-eyebrow"><span class="live-dot"></span>AI Life Intelligence · Now Live</div>
+    <h1>The AI that actually<br/><span class="serif">knows your life</span><br/><span class="dim">— and fixes it.</span></h1>
+    <p class="hero-sub">Not just answers. A full intelligence layer for your health, career, money, relationships, and mind — that learns what matters to you.</p>
+    <div class="hero-proof">
+      <div class="proof-item"><strong>Velo Score™</strong> Life health tracking</div>
+      <div class="proof-sep"></div>
+      <div class="proof-item"><strong>Daily Briefing</strong> Personalized insights</div>
+      <div class="proof-sep"></div>
+      <div class="proof-item"><strong>Smart Follow-ups</strong> Deeper guidance</div>
+      <div class="proof-sep"></div>
+      <div class="proof-item"><strong>12 Life Domains</strong> Full coverage</div>
+    </div>
+    <div class="hero-ctas">
+      <button class="cta-main" onclick="openAuth('signup')">⚡ Start Free — No Card Needed</button>
+      <button class="cta-out" onclick="document.getElementById('features').scrollIntoView({behavior:'smooth'})">See What's Inside →</button>
+    </div>
+  </div>
+
+  <!-- FEATURES SHOWCASE -->
+  <div class="showcase" id="features">
+    <div class="sec-eyebrow">What Makes Velo Different</div>
+    <div class="sec-title">Features that actually <em>move</em> your life forward</div>
+    <div class="feat-grid">
+
+      <!-- Velo Score -->
+      <div class="feat-card wide">
+        <div class="feat-tag">✦ Exclusive</div>
+        <div class="feat-h">Velo Score™ — Your Life Health Meter</div>
+        <div class="feat-p">The first AI that turns your conversations into a real-time Life Score across 6 domains. Watch your score improve as you act on advice.</div>
+        <div class="feat-preview">
+          <div class="fp-label">Your Life Radar</div>
+          <div class="radar-mini">
+            <div class="rm-item"><div class="rm-bar-wrap"><div class="rm-bar" style="width:78%;background:linear-gradient(90deg,#7fffcf,#3b9eff)"></div></div><div class="rm-val">78</div><div class="rm-label">Health</div></div>
+            <div class="rm-item"><div class="rm-bar-wrap"><div class="rm-bar" style="width:62%;background:linear-gradient(90deg,#3b9eff,#c77dff)"></div></div><div class="rm-val">62</div><div class="rm-label">Career</div></div>
+            <div class="rm-item"><div class="rm-bar-wrap"><div class="rm-bar" style="width:85%;background:linear-gradient(90deg,#7fffcf,#00d488)"></div></div><div class="rm-val">85</div><div class="rm-label">Social</div></div>
+            <div class="rm-item"><div class="rm-bar-wrap"><div class="rm-bar" style="width:55%;background:linear-gradient(90deg,#ffd166,#ff6f3c)"></div></div><div class="rm-val">55</div><div class="rm-label">Finance</div></div>
+            <div class="rm-item"><div class="rm-bar-wrap"><div class="rm-bar" style="width:70%;background:linear-gradient(90deg,#c77dff,#3b9eff)"></div></div><div class="rm-val">70</div><div class="rm-label">Mental</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Streak -->
+      <div class="feat-card">
+        <div class="feat-tag gold">🔥 Habit Streaks</div>
+        <div class="feat-h">Build momentum that sticks</div>
+        <div class="feat-p">Track your daily check-ins. Real momentum requires real consistency.</div>
+        <div class="feat-preview" style="margin-top:16px;">
+          <div class="fp-label">This Week</div>
+          <div class="streak-row" style="gap:5px;margin-top:8px;">
+            <div class="streak-day done">M</div><div class="streak-day done">T</div><div class="streak-day done">W</div><div class="streak-day done">T</div><div class="streak-day today">F</div><div class="streak-day">S</div><div class="streak-day">S</div>
+          </div>
+          <div style="margin-top:10px;font-size:13px;font-weight:800;color:var(--gold);">🔥 4-day streak — keep going!</div>
+        </div>
+      </div>
+
+      <!-- Daily Briefing -->
+      <div class="feat-card">
+        <div class="feat-tag blue">📋 Daily Briefing</div>
+        <div class="feat-h">Your morning intelligence drop</div>
+        <div class="feat-p">Every day, Velo surfaces 3 personalized insights based on your life domains.</div>
+        <div class="feat-preview">
+          <div class="fp-label">Today's Briefing</div>
+          <div class="briefing-items" style="margin-top:8px;">
+            <div class="brief-item"><div class="brief-dot" style="background:#7fffcf"></div><div class="brief-text">Your sleep score dropped 3 days in a row. Try asking Velo about sleep hygiene.</div></div>
+            <div class="brief-item"><div class="brief-dot" style="background:#3b9eff"></div><div class="brief-text">You haven't asked about finance in 2 weeks. Budget check-in?</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Smart Follow-ups -->
+      <div class="feat-card">
+        <div class="feat-tag purple">💬 Smart Follow-ups</div>
+        <div class="feat-h">Advice that goes deeper</div>
+        <div class="feat-p">After every answer, Velo suggests 3 intelligent follow-up questions to keep the momentum going and go further.</div>
+      </div>
+
+      <!-- Tone Mode -->
+      <div class="feat-card">
+        <div class="feat-tag orange">🎭 Advice Tone</div>
+        <div class="feat-h">Choose how Velo talks to you</div>
+        <div class="feat-p">Direct Coach, Best Friend, Therapist, or Analyst — Velo adapts its communication style to what you need right now.</div>
+      </div>
+
+      <!-- Mood check-in -->
+      <div class="feat-card">
+        <div class="feat-tag">😌 Mood Check-in</div>
+        <div class="feat-h">Context-aware intelligence</div>
+        <div class="feat-p">Tell Velo how you're feeling. It tailors every response to your current emotional state — not a generic script.</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- PRICING -->
+  <div class="pricing-wrap" id="pricing">
+    <div class="sec-eyebrow">Pricing</div>
+    <div class="sec-title">Start free. <em>Upgrade when ready.</em></div>
+    <div class="pricing-toggle">
+      <span class="toggle-opt on" id="tog-monthly">Monthly</span>
+      <div class="toggle-pill" onclick="toggleBilling()"><div class="toggle-thumb" id="tog-thumb"></div></div>
+      <span class="toggle-opt" id="tog-annual">Annual</span>
+      <span class="save-badge" id="save-badge" style="display:none">Save 30%</span>
+    </div>
+    <div class="p-grid">
+      <div class="p-card">
+        <div class="p-name">Free</div>
+        <div class="p-price-row"><div class="p-price"><sup>$</sup>0<sub>/mo</sub></div></div>
+        <div class="p-desc">Everything you need to start.</div>
+        <ul class="p-feats">
+          <li><span class="ck">✓</span> 5 questions / day</li>
+          <li><span class="ck">✓</span> All 12 life categories</li>
+          <li><span class="ck">✓</span> Standard AI responses</li>
+          <li><span class="ck">✓</span> Mood check-in</li>
+          <li><span class="xk">✗</span> <span style="color:var(--muted)">Velo Score™ tracking</span></li>
+          <li><span class="xk">✗</span> <span style="color:var(--muted)">Daily Briefing</span></li>
+          <li><span class="xk">✗</span> <span style="color:var(--muted)">Smart Follow-ups</span></li>
+          <li><span class="xk">✗</span> <span style="color:var(--muted)">Saved history</span></li>
+        </ul>
+        <button class="p-btn pb0" onclick="openAuth('signup')">Get Started Free</button>
+      </div>
+      <div class="p-card hot">
+        <div class="p-hotlabel">MOST POPULAR</div>
+        <div class="p-name">Pro</div>
+        <div class="p-price-row"><div class="p-price" id="pro-price"><sup>$</sup>9<sub>/mo</sub></div></div>
+        <div class="p-desc">For people building a better life, seriously.</div>
+        <ul class="p-feats">
+          <li><span class="ck">✓</span> <strong>Unlimited</strong> questions</li>
+          <li><span class="ck">✓</span> All 12 categories</li>
+          <li><span class="ck">✓</span> Enhanced AI depth</li>
+          <li><span class="ck">✓</span> <strong>Velo Score™</strong> tracking</li>
+          <li><span class="ck">✓</span> <strong>Daily Briefing</strong></li>
+          <li><span class="ck">✓</span> Smart Follow-ups</li>
+          <li><span class="ck">✓</span> Habit Streak tracker</li>
+          <li><span class="ck">✓</span> 30-day history</li>
+        </ul>
+        <button class="p-btn pb1" onclick="openPayment('pro')">Upgrade to Pro →</button>
+      </div>
+      <div class="p-card">
+        <div class="p-name">Elite <span style="color:var(--gold)">✦</span></div>
+        <div class="p-price-row"><div class="p-price" style="color:var(--gold)" id="elite-price"><sup>$</sup>19<sub>/mo</sub></div></div>
+        <div class="p-desc">The complete Velo experience, nothing held back.</div>
+        <ul class="p-feats">
+          <li><span class="ck">✓</span> Everything in Pro</li>
+          <li><span class="ck">✓</span> <strong>Elite AI</strong> — deepest analysis</li>
+          <li><span class="ck">✓</span> All 4 tone modes</li>
+          <li><span class="ck">✓</span> Unlimited history</li>
+          <li><span class="ck">✓</span> Priority responses</li>
+          <li><span class="ck">✓</span> Early feature access</li>
+          <li><span class="ck">✓</span> Life Coach persona</li>
+          <li><span class="ck">✓</span> Export your insights</li>
+        </ul>
+        <button class="p-btn pb2" onclick="openPayment('elite')">Get Elite →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ APP ═══════════ -->
+<div id="app-page" class="page">
+  <div class="app-shell">
+    <aside class="sb" id="sidebar">
+      <div class="sb-top">
+        <div class="sb-logo"><div class="logo-gem" style="width:28px;height:28px;font-size:13px;">⚡</div>Velo <em>AI</em></div>
+        <div class="sb-user" onclick="showPg('settings')">
+          <div class="u-av" id="sbAv">?</div>
+          <div>
+            <div class="u-name" id="sbName">User</div>
+            <div class="u-plan"><span class="plan-pip pip-free" id="planPip"></span><span id="sbPlan">Free</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Velo Score mini card -->
+      <div class="sb-score-card" id="sbScoreCard" onclick="showPg('score')" style="display:none;">
+        <div class="sc-label">⚡ Velo Score™</div>
+        <div class="sc-bar-row">
+          <div class="sc-bar"><div class="sc-fill" id="sbScoreFill" style="width:0%"></div></div>
+          <div class="sc-num" id="sbScoreNum">—</div>
+        </div>
+      </div>
+
+      <div class="sb-body">
+        <div class="sb-sec">Workspace</div>
+        <div class="sb-item on" id="nav-ask" onclick="showPg('ask')"><span class="si">💬</span> Ask Velo</div>
+        <div class="sb-item" id="nav-score" onclick="showPg('score')"><span class="si">📊</span> Velo Score™ <span class="pro-badge">PRO</span></div>
+        <div class="sb-item" id="nav-history" onclick="showPg('history')"><span class="si">🕐</span> My History</div>
+
+        <div class="sb-sec">Life Domains</div>
+        <div class="sb-item" onclick="setC('health');showPg('ask')"><span class="si">🫀</span> Health</div>
+        <div class="sb-item" onclick="setC('mental');showPg('ask')"><span class="si">🧠</span> Mental Health</div>
+        <div class="sb-item" onclick="setC('finance');showPg('ask')"><span class="si">💰</span> Finance</div>
+        <div class="sb-item" onclick="setC('career');showPg('ask')"><span class="si">🚀</span> Career</div>
+        <div class="sb-item" onclick="setC('social');showPg('ask')"><span class="si">🤝</span> Social</div>
+        <div class="sb-item" onclick="setC('food');showPg('ask')"><span class="si">🥗</span> Food & Nutrition</div>
+        <div class="sb-item" onclick="setC('fitness');showPg('ask')"><span class="si">🏋️</span> Fitness</div>
+
+        <div class="sb-sec">Account</div>
+        <div class="sb-item" id="nav-settings" onclick="showPg('settings')"><span class="si">⚙️</span> Settings</div>
+        <div class="sb-item" onclick="logout()"><span class="si">🚪</span> Sign Out</div>
+      </div>
+      <div class="sb-upg">
+        <div class="upg-card" id="upgCard" onclick="openPayment('pro')">
+          <h4>⚡ Unlock Pro Features</h4>
+          <p>Velo Score™, Daily Briefing, unlimited questions & more</p>
+        </div>
+      </div>
+    </aside>
+
+    <main class="app-main">
+      <div class="app-bar">
+        <h1 id="barTitle">Ask Velo</h1>
+        <div class="bar-right">
+          <div class="streak-chip" id="streakChip">🔥 <span id="streakNum">0</span> day streak</div>
+          <div class="usage-chip">
+            <span class="uc-label" id="usageLbl">0/5 today</span>
+            <div class="uc-bar"><div class="uc-fill" id="ucFill" style="width:0%"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ASK PAGE -->
+      <div class="app-content" id="pg-ask">
+        <div id="limitWrap" style="display:none;">
+          <div class="limit-wrap">
+            <div style="font-size:22px;">⚠️</div>
+            <div class="lw-text"><h4>Daily limit reached</h4><p>Upgrade to Pro for unlimited questions + Velo Score™ + Daily Briefing</p></div>
+            <button class="lw-btn" onclick="openPayment('pro')">Upgrade to Pro →</button>
+          </div>
+        </div>
+
+        <div id="moodBanner"></div>
+        <div id="briefingCard"></div>
+
+        <div class="cat-scroll" id="catScroll"></div>
+        <div class="qp-row" id="qpRow"></div>
+
+        <div class="input-card">
+          <div class="ic-top">
+            <div class="ic-label">💬 Your situation <span class="cat-indicator" id="catInd">General</span></div>
+            <textarea id="mainInput" placeholder="Describe what's going on — the more detail you give, the more precise Velo's advice will be…" oninput="updateCC()"></textarea>
+          </div>
+          <div class="ic-bottom">
+            <div class="ic-meta">
+              <span class="ic-chars"><span id="cc">0</span>c</span>
+              <select class="tone-select" id="toneSelect">
+                <option value="coach">🎯 Direct Coach</option>
+                <option value="friend">🤝 Best Friend</option>
+                <option value="therapist">💙 Therapist</option>
+                <option value="analyst">📊 Analyst</option>
+              </select>
+            </div>
+            <button class="btn-ask" id="askBtn" onclick="doAsk()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 2L11 13M22 2L15 22l-4-9-9-4 20-7z"/></svg>
+              Ask Velo
+            </button>
+          </div>
+        </div>
+
+        <div id="respArea" style="margin-top:20px;"></div>
+        <div id="sessHistArea"></div>
+      </div>
+
+      <!-- VELO SCORE PAGE -->
+      <div class="app-content" id="pg-score" style="display:none;">
+        <div class="score-page" id="scorePage"></div>
+      </div>
+
+      <!-- HISTORY PAGE -->
+      <div class="app-content" id="pg-history" style="display:none;">
+        <div class="hist-page" id="histPage">
+          <div class="hw-title" style="font-size:16px;font-weight:800;margin-bottom:16px;">Saved <span style="color:var(--a1)">History</span></div>
+          <div id="histList"></div>
+        </div>
+      </div>
+
+      <!-- SETTINGS PAGE -->
+      <div class="app-content" id="pg-settings" style="display:none;">
+        <div class="settings-page">
+          <div class="stg-card">
+            <h3>👤 Profile</h3>
+            <div class="stg-row"><span class="stg-k">Name</span><span class="stg-v" id="stName">—</span></div>
+            <div class="stg-row"><span class="stg-k">Email</span><span class="stg-v" id="stEmail">—</span></div>
+            <div class="stg-row"><span class="stg-k">Member Since</span><span class="stg-v" id="stJoined">—</span></div>
+          </div>
+          <div class="stg-card">
+            <h3>💳 Subscription</h3>
+            <div class="stg-row"><span class="stg-k">Current Plan</span><span class="stg-v" id="stPlan">—</span></div>
+            <div class="stg-row"><span class="stg-k">Questions Today</span><span class="stg-v" id="stUsage">—</span></div>
+            <div class="stg-row"><span class="stg-k">History</span><span class="stg-v" id="stHistCnt">—</span></div>
+            <div class="stg-row"><span class="stg-k">Streak</span><span class="stg-v" id="stStreak">—</span></div>
+            <div style="margin-top:16px;display:flex;gap:9px;flex-wrap:wrap;" id="planActions"></div>
+          </div>
+          <div class="stg-card">
+            <h3>⚙️ Preferences</h3>
+            <div class="stg-row"><span class="stg-k">Default Tone</span>
+              <select class="tone-select" id="prefTone" onchange="savePref()">
+                <option value="coach">🎯 Direct Coach</option>
+                <option value="friend">🤝 Best Friend</option>
+                <option value="therapist">💙 Therapist</option>
+                <option value="analyst">📊 Analyst</option>
+              </select>
+            </div>
+          </div>
+          <div class="stg-card">
+            <h3>⚙️ Account</h3>
+            <div style="display:flex;gap:9px;flex-wrap:wrap;">
+              <button class="btn-danger" onclick="clearHist()">🗑 Clear History</button>
+              <button class="btn-danger" onclick="logout()">🚪 Sign Out</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- AUTH MODAL -->
+<div class="overlay" id="authOverlay">
+  <div class="modal">
+    <button class="m-close" onclick="closeAuth()">✕</button>
+    <div class="m-logo"><div class="logo-gem" style="width:26px;height:26px;font-size:12px;">⚡</div>Velo <em>AI</em></div>
+    <div class="m-title" id="authTitle">Create Account</div>
+    <p class="m-sub" id="authSub">Start free — no card needed.</p>
+    <div class="err-box" id="authErr"></div>
+    <div class="fg" id="nameGrp"><label class="fl">Full Name</label><input class="fi" id="authName" type="text" placeholder="Jane Smith"/></div>
+    <div class="fg"><label class="fl">Email</label><input class="fi" id="authEmail" type="email" placeholder="you@example.com"/></div>
+    <div class="fg"><label class="fl">Password</label><input class="fi" id="authPass" type="password" placeholder="Min 6 characters"/></div>
+    <button class="btn-sub" id="authSubmit" onclick="submitAuth()">Create Account</button>
+    <div class="auth-sw" id="authSw">Already have an account? <a onclick="toggleMode()">Sign in</a></div>
+  </div>
+</div>
+
+<!-- PAY MODAL -->
+<div class="overlay" id="payOverlay">
+  <div class="modal pay-modal">
+    <button class="m-close" onclick="closePay()">✕</button>
+    <div class="m-logo"><div class="logo-gem" style="width:26px;height:26px;font-size:12px;">⚡</div>Velo <em>AI</em></div>
+    <div class="m-title" id="payTitle">Upgrade Plan</div>
+    <div id="payBody"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"><span id="tIcon">✓</span><span id="tMsg"></span></div>
+
+<script>
+// ─── STORAGE ───
+const DB={
+  async get(k){try{const r=await window.storage.get(k);return r?JSON.parse(r.value):null;}catch{return null;}},
+  async set(k,v){try{await window.storage.set(k,JSON.stringify(v));}catch(e){console.error(e);}},
+  async del(k){try{await window.storage.delete(k);}catch{}}
+};
+
+// ─── CONFIG ───
+let CU=null,authMode='signup',selPlan='pro',curCat='general',sessHist=[],isAnnual=false;
+
+const PLANS={
+  free:{name:'Free',label:'Free',daily:5},
+  pro:{name:'Pro',label:'Pro ⚡',daily:Infinity},
+  elite:{name:'Elite',label:'Elite ✦',daily:Infinity}
+};
+
+const CATS={
+  general:{l:'General',i:'🌐'},health:{l:'Health',i:'🫀'},tech:{l:'Tech',i:'💻'},
+  social:{l:'Social',i:'🤝'},food:{l:'Food',i:'🥗'},finance:{l:'Finance',i:'💰'},
+  career:{l:'Career',i:'🚀'},mental:{l:'Mental Health',i:'🧠'},fitness:{l:'Fitness',i:'🏋️'},
+  travel:{l:'Travel',i:'✈️'},home:{l:'Home',i:'🏠'},learning:{l:'Learning',i:'📚'}
+};
+
+const CAT_CTX={
+  general:'general life advice and problem-solving',health:'health, wellness, and medical guidance',
+  tech:'technology, devices, and digital life',social:'social skills, relationships, and communication',
+  food:'nutrition, food, and eating habits',finance:'personal finance, budgeting, and money',
+  career:'career growth and professional development',mental:'mental health and emotional wellbeing',
+  fitness:'fitness, exercise, and physical performance',travel:'travel planning and tips',
+  home:'home life and organization',learning:'learning and skill development'
+};
+
+const QP={
+  general:["My life feels stuck — help me figure out why","I need to make a big decision and I'm paralyzed","How do I stop procrastinating everything?"],
+  health:["I'm exhausted despite sleeping 8 hours","I keep getting sick — how do I fix my immune system?","My energy crashes every afternoon"],
+  tech:["My laptop is painfully slow, what do I do?","How do I actually protect my privacy online?","Help me choose between iPhone and Android"],
+  social:["I'm lonely but struggle to connect with people","How do I deal with a toxic friend?","I freeze up in social situations"],
+  food:["I want to eat healthier but I'm always busy","What should I eat to have consistent energy?","Give me a realistic high-protein meal plan"],
+  finance:["I'm living paycheck to paycheck — where do I start?","I want to invest but I have no idea how","Help me build an emergency fund on a tight budget"],
+  career:["I hate my job but I'm scared to leave","How do I ask for a raise without sounding greedy?","I want to switch careers in my 30s"],
+  mental:["I've been anxious for weeks and I don't know why","I feel stuck in a low motivation loop","How do I stop overthinking everything?"],
+  fitness:["I want to get fit but I hate the gym","Give me a beginner workout I'll actually stick to","How do I lose weight without starving?"],
+  travel:["What are some underrated travel destinations?","How do I travel solo safely?","Tips for long-haul flights"],
+  home:["My apartment feels chaotic — how do I fix it?","Easy ways to make a small space feel bigger","Simple home maintenance I should know"],
+  learning:["How do I actually retain what I learn?","Best way to learn a new language fast?","I want to read 20 books this year — how?"]
+};
+
+const TONE_PROMPTS={
+  coach:"Be a direct, no-nonsense life coach. Lead with action. Cut through the noise. Be motivating but brutally honest.",
+  friend:"Be a warm, genuine best friend who happens to know everything. Casual language, genuine care, real talk.",
+  therapist:"Be empathetic and thoughtful. Validate feelings, ask good questions, help them understand themselves. Gentle but insightful.",
+  analyst:"Be precise, data-driven, and structured. Use frameworks, numbered steps, pros/cons. Logic over emotion."
+};
+
+const BRIEFING_TEMPLATES=[
+  {cat:'health',dot:'#7fffcf',text:"Your health domain hasn't been checked in a while. Ask Velo about energy, sleep, or diet."},
+  {cat:'finance',dot:'#ffd166',text:"Finance is the #1 source of stress for most people. Is your money situation working for you?"},
+  {cat:'mental',dot:'#c77dff',text:"Mental health shapes everything else. How are you actually feeling today?"},
+  {cat:'career',dot:'#3b9eff',text:"Are you growing in your career, or just staying busy? Ask Velo to help you think it through."},
+  {cat:'social',dot:'#ff6f3c',text:"Loneliness is a silent crisis. When did you last invest in a relationship that matters?"}
+];
+
+const SCORE_DOMAINS=[
+  {key:'health',label:'Health',icon:'🫀',color:'#7fffcf'},
+  {key:'mental',label:'Mental',icon:'🧠',color:'#c77dff'},
+  {key:'finance',label:'Finance',icon:'💰',color:'#ffd166'},
+  {key:'career',label:'Career',icon:'🚀',color:'#3b9eff'},
+  {key:'social',label:'Social',icon:'🤝',color:'#ff6f3c'},
+  {key:'fitness',label:'Fitness',icon:'🏋️',color:'#7fffcf'}
+];
+
+// ─── INIT ───
+async function init(){
+  try{
+    const s=await DB.get('velo_sess');
+    if(s?.uid){const u=await DB.get('velo_u_'+s.uid);if(u){CU=u;enterApp();return;}}
+  }catch(e){console.log(e);}
+}
+
+// ─── BILLING TOGGLE ───
+function toggleBilling(){
+  isAnnual=!isAnnual;
+  document.getElementById('tog-thumb').className='toggle-thumb'+(isAnnual?' right':'');
+  document.getElementById('tog-monthly').className='toggle-opt'+(isAnnual?'':' on');
+  document.getElementById('tog-annual').className='toggle-opt'+(isAnnual?' on':'');
+  document.getElementById('save-badge').style.display=isAnnual?'inline-flex':'none';
+  document.getElementById('pro-price').innerHTML=isAnnual?'<sup>$</sup>6<sub>/mo</sub>':'<sup>$</sup>9<sub>/mo</sub>';
+  document.getElementById('elite-price').innerHTML=isAnnual?'<sup>$</sup>13<sub>/mo</sub>':'<sup>$</sup>19<sub>/mo</sub>';
+}
+
+// ─── AUTH ───
+function openAuth(m){authMode=m;document.getElementById('authOverlay').classList.add('open');renderAuthUI();}
+function closeAuth(){document.getElementById('authOverlay').classList.remove('open');}
+function toggleMode(){authMode=authMode==='signup'?'login':'signup';renderAuthUI();}
+function renderAuthUI(){
+  const s=authMode==='signup';
+  document.getElementById('authTitle').textContent=s?'Create Account':'Welcome Back';
+  document.getElementById('authSub').textContent=s?'Join free — no card needed.':'Sign in to your Velo account.';
+  document.getElementById('authSubmit').textContent=s?'Create Account →':'Sign In →';
+  document.getElementById('nameGrp').style.display=s?'block':'none';
+  document.getElementById('authSw').innerHTML=s?'Already have an account? <a onclick="toggleMode()">Sign in</a>':'New to Velo? <a onclick="toggleMode()">Create account</a>';
+  document.getElementById('authErr').style.display='none';
+}
+async function submitAuth(){
+  const email=document.getElementById('authEmail').value.trim().toLowerCase();
+  const pass=document.getElementById('authPass').value;
+  const name=document.getElementById('authName').value.trim();
+  const errEl=document.getElementById('authErr');
+  errEl.style.display='none';
+  if(!email||!pass){errEl.textContent='Please fill in all fields.';errEl.style.display='block';return;}
+  if(authMode==='signup'&&!name){errEl.textContent='Please enter your name.';errEl.style.display='block';return;}
+  if(pass.length<6){errEl.textContent='Password must be at least 6 characters.';errEl.style.display='block';return;}
+  const btn=document.getElementById('authSubmit');btn.disabled=true;btn.textContent='Loading…';
+  try{
+    if(authMode==='signup'){
+      const ex=await DB.get('velo_em_'+btoa(email));
+      if(ex){errEl.textContent='Account already exists.';errEl.style.display='block';btn.disabled=false;btn.textContent='Create Account →';return;}
+      const uid='u'+Date.now();
+      const user={id:uid,name,email,pw:btoa(pass),plan:'free',joined:new Date().toLocaleDateString('en-US',{month:'long',year:'numeric'}),du:{d:'',c:0},history:[],streak:0,lastActive:'',scores:{health:0,mental:0,finance:0,career:0,social:0,fitness:0},mood:null,prefs:{tone:'coach'}};
+      await DB.set('velo_u_'+uid,user);
+      await DB.set('velo_em_'+btoa(email),{uid});
+      await DB.set('velo_sess',{uid});
+      CU=user;
+    } else {
+      const idx=await DB.get('velo_em_'+btoa(email));
+      if(!idx){errEl.textContent='No account with this email.';errEl.style.display='block';btn.disabled=false;btn.textContent='Sign In →';return;}
+      const u=await DB.get('velo_u_'+idx.uid);
+      if(!u||u.pw!==btoa(pass)){errEl.textContent='Incorrect password.';errEl.style.display='block';btn.disabled=false;btn.textContent='Sign In →';return;}
+      await DB.set('velo_sess',{uid:u.id});
+      CU=u;
+    }
+  }catch(e){errEl.textContent='Error — try again.';errEl.style.display='block';btn.disabled=false;btn.textContent=authMode==='signup'?'Create Account →':'Sign In →';return;}
+  btn.disabled=false;closeAuth();enterApp();
+  showToast(authMode==='signup'?'Welcome to Velo AI! ⚡':'Welcome back! 🔥');
+}
+async function logout(){
+  await DB.del('velo_sess');CU=null;sessHist=[];
+  document.getElementById('app-page').classList.remove('active');
+  document.getElementById('landing').classList.add('active');
+  showToast('Signed out.');
+}
+
+// ─── STREAK ───
+async function updateStreak(){
+  if(!CU)return;
+  const today=new Date().toISOString().split('T')[0];
+  const last=CU.lastActive||'';
+  if(last===today)return;
+  const yesterday=new Date(Date.now()-86400000).toISOString().split('T')[0];
+  CU.streak=(last===yesterday)?(CU.streak||0)+1:1;
+  CU.lastActive=today;
+  await DB.set('velo_u_'+CU.id,CU);
+}
+
+// ─── APP ENTRY ───
+async function enterApp(){
+  await updateStreak();
+  document.getElementById('landing').classList.remove('active');
+  document.getElementById('app-page').classList.add('active');
+  updateSB();buildCatScroll();buildQP();showPg('ask');updateMeter();
+  renderMoodBanner();renderBriefing();
+  if(document.getElementById('toneSelect')&&CU.prefs?.tone){document.getElementById('toneSelect').value=CU.prefs.tone;}
+}
+
+function updateSB(){
+  if(!CU)return;
+  document.getElementById('sbAv').textContent=CU.name.charAt(0).toUpperCase();
+  document.getElementById('sbName').textContent=CU.name;
+  const p=CU.plan||'free';
+  document.getElementById('sbPlan').textContent=PLANS[p].label;
+  document.getElementById('planPip').className='plan-pip pip-'+p;
+  document.getElementById('upgCard').style.display=p==='free'?'flex':'none';
+  document.getElementById('streakNum').textContent=CU.streak||0;
+  // Score card
+  if(p!=='free'){
+    document.getElementById('sbScoreCard').style.display='block';
+    const score=calcScore();
+    document.getElementById('sbScoreNum').textContent=score;
+    document.getElementById('sbScoreFill').style.width=score+'%';
+  }
+}
+
+function calcScore(){
+  if(!CU||!CU.scores)return 0;
+  const vals=Object.values(CU.scores).filter(v=>v>0);
+  if(!vals.length)return 0;
+  return Math.round(vals.reduce((a,b)=>a+b,0)/vals.length);
+}
+
+function showPg(p){
+  ['ask','score','history','settings'].forEach(id=>{
+    document.getElementById('pg-'+id).style.display=id===p?'block':'none';
+    const n=document.getElementById('nav-'+id);
+    if(n)n.classList.toggle('on',id===p);
+  });
+  const titles={ask:'Ask Velo',score:'Velo Score™',history:'My History',settings:'Settings'};
+  document.getElementById('barTitle').textContent=titles[p]||'Velo AI';
+  if(p==='score')renderScorePage();
+  if(p==='history')renderHistPage();
+  if(p==='settings')renderSettings();
+}
+
+function buildCatScroll(){
+  document.getElementById('catScroll').innerHTML=Object.entries(CATS).map(([k,v])=>
+    `<div class="cc${k===curCat?' on':''}" data-c="${k}" onclick="setC('${k}')">${v.i} ${v.l}</div>`
+  ).join('');
+}
+
+function setC(c){
+  curCat=c;
+  document.querySelectorAll('.cc').forEach(el=>el.classList.toggle('on',el.dataset.c===c));
+  buildQP();
+  document.getElementById('mainInput').placeholder=`Ask Velo about ${CAT_CTX[c]}…`;
+  document.getElementById('catInd').textContent=CATS[c].l;
+}
+
+function buildQP(){
+  document.getElementById('qpRow').innerHTML=(QP[curCat]||QP.general).map(p=>
+    `<div class="qp" onclick="useQ(this)">${p}</div>`).join('');
+}
+
+function useQ(el){document.getElementById('mainInput').value=el.textContent;updateCC();document.getElementById('mainInput').focus();}
+function updateCC(){document.getElementById('cc').textContent=document.getElementById('mainInput').value.length;}
+
+function today(){return new Date().toISOString().split('T')[0];}
+function getUsed(){if(!CU)return 0;const d=CU.du||{d:'',c:0};return d.d===today()?d.c:0;}
+function updateMeter(){
+  if(!CU)return;
+  const p=CU.plan||'free',used=getUsed(),lim=PLANS[p].daily;
+  const pct=lim===Infinity?0:Math.min(100,(used/lim)*100);
+  document.getElementById('usageLbl').textContent=lim===Infinity?`${used} asked (∞)`:`${used}/${lim} today`;
+  const f=document.getElementById('ucFill');f.style.width=pct+'%';f.className='uc-fill'+(pct>=80?' warn':'');
+  document.getElementById('limitWrap').style.display=(lim!==Infinity&&used>=lim)?'block':'none';
+  const ab=document.getElementById('askBtn');if(ab)ab.disabled=(lim!==Infinity&&used>=lim);
+}
+
+// ─── MOOD BANNER ───
+function renderMoodBanner(){
+  const d=document.getElementById('moodBanner');
+  if(CU?.mood)return; // already set today
+  d.innerHTML=`
+    <div class="mood-banner">
+      <div>
+        <div class="mb-title">How are you feeling right now?</div>
+        <div class="mb-sub">Velo tailors advice to your current state.</div>
+      </div>
+      <div class="mood-emojis">
+        <div class="m-emoji" onclick="setMood('great','😄')">😄</div>
+        <div class="m-emoji" onclick="setMood('okay','😐')">😐</div>
+        <div class="m-emoji" onclick="setMood('tired','😩')">😩</div>
+        <div class="m-emoji" onclick="setMood('stressed','😰')">😰</div>
+        <div class="m-emoji" onclick="setMood('low','😔')">😔</div>
+      </div>
+      <button class="mood-dismiss" onclick="document.getElementById('moodBanner').innerHTML=''">✕</button>
+    </div>`;
+}
+
+async function setMood(mood,emoji){
+  CU.mood=mood;
+  await DB.set('velo_u_'+CU.id,CU);
+  document.getElementById('moodBanner').innerHTML=`
+    <div class="mood-banner" style="background:rgba(123,255,207,.05);">
+      <div style="font-size:24px;">${emoji}</div>
+      <div><div class="mb-title">Got it — feeling ${mood}</div><div class="mb-sub">Velo will keep that in mind for your advice today.</div></div>
+    </div>`;
+  setTimeout(()=>document.getElementById('moodBanner').innerHTML='',2500);
+}
+
+// ─── DAILY BRIEFING ───
+function renderBriefing(){
+  const p=CU?.plan||'free';
+  if(p==='free')return;
+  const hist=CU?.history||[];
+  // pick 2-3 relevant items
+  const usedCats=new Set(hist.slice(0,10).map(h=>h.cat));
+  const suggestions=BRIEFING_TEMPLATES.filter(b=>!usedCats.has(b.cat)).slice(0,2);
+  if(!suggestions.length)return;
+  const d=document.getElementById('briefingCard');
+  const today=new Date().toLocaleDateString('en-US',{weekday:'long',month:'short',day:'numeric'});
+  d.innerHTML=`
+    <div class="briefing-card">
+      <div class="bc-header">
+        <div class="bc-icon">☀️</div>
+        <div class="bc-meta"><h3>Your Daily Briefing</h3><p>${today}</p></div>
+        <button class="bc-dismiss" onclick="document.getElementById('briefingCard').innerHTML=''">✕</button>
+      </div>
+      <div class="briefing-items">
+        ${suggestions.map(s=>`
+          <div class="bi-item" onclick="setC('${s.cat}');document.getElementById('mainInput').focus();document.getElementById('briefingCard').innerHTML=''">
+            <div class="bi-dot" style="background:${s.dot}"></div>
+            <div class="bi-text">${s.text}</div>
+            <div class="bi-arrow">→</div>
+          </div>`).join('')}
+      </div>
+    </div>`;
+}
+
+// ─── ASK ───
+async function incUsage(){
+  const t=today();
+  if(!CU.du||CU.du.d!==t)CU.du={d:t,c:1};
+  else CU.du.c++;
+  await DB.set('velo_u_'+CU.id,CU);
+  updateMeter();
+}
+
+async function updateDomainScore(cat){
+  if(!CU.scores)CU.scores={};
+  const cur=CU.scores[cat]||0;
+  CU.scores[cat]=Math.min(100,cur+Math.floor(Math.random()*8)+5);
+  await DB.set('velo_u_'+CU.id,CU);
+}
+
+async function doAsk(){
+  const input=document.getElementById('mainInput').value.trim();
+  if(!input)return;
+  const p=CU.plan||'free',used=getUsed(),lim=PLANS[p].daily;
+  if(lim!==Infinity&&used>=lim){showToast('Daily limit reached. Upgrade to Pro!');return;}
+
+  const btn=document.getElementById('askBtn');btn.disabled=true;
+  const tone=document.getElementById('toneSelect').value;
+  const moodCtx=CU.mood?`The user is currently feeling: ${CU.mood}. Adapt your communication style accordingly.`:'';
+  const isElite=p==='elite',isPro=p==='pro'||isElite;
+
+  document.getElementById('respArea').innerHTML=`
+    <div class="loading-card">
+      <div class="ldots"><span></span><span></span><span></span></div>
+      <div class="lt">Analyzing your situation…<br/><em>Crafting ${tone} advice</em></div>
+    </div>`;
+
+  const sys=`You are Velo AI, an expert life intelligence advisor.
+
+TONE DIRECTIVE: ${TONE_PROMPTS[tone]}
+CATEGORY: ${CAT_CTX[curCat]}
+${moodCtx}
+PLAN: ${PLANS[p].name} — ${isElite?'Maximum depth, expert-level analysis.':isPro?'Enhanced depth and nuance.':'Clear, practical, actionable.'}
+
+RULES:
+- Address the SPECIFIC situation described — read carefully
+- Use **bold** for key points, → for bullet points
+- Use headers with ### for sections
+- Add 3 smart follow-up questions at the END in this exact format: [FOLLOWUPS: Question one|Question two|Question three]
+- Add one key tip: [TIP: insight]
+- Aim for ${isElite?'400-600':isPro?'300-450':'220-350'} words
+- Start with a 1-sentence acknowledgment, then solutions`;
+
+  try{
+    const res=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:1000,system:sys,messages:[{role:"user",content:input}]})});
+    const data=await res.json();
+    if(data.error)throw new Error(data.error.message);
+    const raw=data.content?.[0]?.text||"No response.";
+
+    // Extract follow-ups
+    let followups=[];
+    const fuMatch=raw.match(/\[FOLLOWUPS:\s*(.*?)\]/s);
+    if(fuMatch){followups=fuMatch[1].split('|').map(s=>s.trim()).filter(Boolean).slice(0,3);}
+    const cleanRaw=raw.replace(/\[FOLLOWUPS:.*?\]/s,'').trim();
+
+    await incUsage();
+    await updateDomainScore(curCat);
+
+    const entry={id:'h'+Date.now(),q:input,cat:curCat,icon:CATS[curCat].i,time:new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}),date:new Date().toLocaleDateString('en-US',{month:'short',day:'numeric'}),full:cleanRaw,followups,tone};
+    if(!CU.history)CU.history=[];
+    CU.history.unshift(entry);
+    CU.history=CU.history.slice(0,p==='elite'?500:p==='pro'?200:30);
+    await DB.set('velo_u_'+CU.id,CU);
+    sessHist.unshift(entry);
+
+    showResp(fmt(cleanRaw),entry,followups);
+    updateSB();
+    document.getElementById('mainInput').value='';updateCC();
+    renderSessHist();
+  }catch(err){
+    document.getElementById('respArea').innerHTML=`<div class="api-err">⚠️ Connection issue. Try again.<br/><small style="opacity:.7">${err.message}</small></div>`;
+  }
+  btn.disabled=false;updateMeter();
+}
+
+function fmt(t){
+  return t.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')
+    .replace(/\[TIP:\s*(.*?)\]/g,'<div class="tip-block"><strong>⚡ Velo Tip:</strong> $1</div>')
+    .replace(/^###\s+(.+)$/gm,'<h3>$1</h3>')
+    .replace(/^##\s+(.+)$/gm,'<h3>$1</h3>')
+    .replace(/^→\s+(.+)$/gm,'<li>$1</li>')
+    .replace(/^[-•]\s+(.+)$/gm,'<li>$1</li>')
+    .replace(/(<li>[\s\S]*?<\/li>)+/g,m=>'<ul>'+m+'</ul>')
+    .split('\n\n').map(b=>b.startsWith('<')?b:`<p>${b}</p>`).join('');
+}
+
+const TONE_LABELS={coach:'🎯 Coach',friend:'🤝 Friend',therapist:'💙 Therapist',analyst:'📊 Analyst'};
+
+function showResp(html,entry,followups=[]){
+  const fuHtml=followups.length?`
+    <div class="followup-section">
+      <div class="fu-label">Go deeper →</div>
+      <div class="fu-chips">
+        ${followups.map(q=>`<div class="fu-chip" onclick="useFU(this)">${q}</div>`).join('')}
+      </div>
+    </div>`:'';
+
+  document.getElementById('respArea').innerHTML=`
+    <div class="resp-card">
+      <div class="resp-head">
+        <div class="ai-gem">⚡</div>
+        <div class="resp-meta">
+          <div class="resp-name">Velo AI</div>
+          <div class="resp-tag">${entry.icon} ${CATS[entry.cat].l} · ${TONE_LABELS[entry.tone]||''} · ${entry.time}</div>
+        </div>
+        <div class="resp-actions">
+          <button class="r-action" onclick="copyResp()">Copy</button>
+        </div>
+      </div>
+      <div class="resp-body">${html}</div>
+      ${fuHtml}
+    </div>`;
+}
+
+function useFU(el){
+  document.getElementById('mainInput').value=el.textContent;
+  updateCC();
+  document.getElementById('mainInput').focus();
+  el.style.borderColor='rgba(123,255,207,.4)';
+  el.style.color='var(--a1)';
+}
+
+function copyResp(){
+  const body=document.querySelector('.resp-body');
+  if(body)navigator.clipboard.writeText(body.innerText).then(()=>showToast('Response copied!'));
+}
+
+function renderSessHist(){
+  const r=sessHist.slice(1,5);
+  if(!r.length){document.getElementById('sessHistArea').innerHTML='';return;}
+  document.getElementById('sessHistArea').innerHTML=`
+    <div class="sess-hist">
+      <div class="sh-title">Earlier this session</div>
+      ${r.map((e,i)=>`
+        <div class="h-item" onclick="reloadSess(${i+1})">
+          <div class="h-ic">${e.icon}</div>
+          <div style="flex:1;min-width:0;">
+            <div class="h-q">${e.q.length>80?e.q.slice(0,77)+'…':e.q}</div>
+            <div class="h-c">${e.cat} · ${TONE_LABELS[e.tone]||''}</div>
+          </div>
+          <div class="h-t">${e.time}</div>
+        </div>`).join('')}
+    </div>`;
+}
+
+function reloadSess(i){const e=sessHist[i];showResp(fmt(e.full),e,e.followups||[]);document.getElementById('respArea').scrollIntoView({behavior:'smooth'});}
+
+// ─── VELO SCORE PAGE ───
+function renderScorePage(){
+  const p=CU.plan||'free';
+  if(p==='free'){
+    document.getElementById('scorePage').innerHTML=`
+      <div style="text-align:center;padding:80px 20px;">
+        <div style="font-size:52px;margin-bottom:20px;">📊</div>
+        <h2 style="font-size:28px;font-weight:900;letter-spacing:-1px;margin-bottom:10px;">Velo Score™</h2>
+        <p style="font-size:15px;color:var(--muted2);max-width:360px;margin:0 auto 28px;line-height:1.6;">Upgrade to Pro to unlock your personal Life Health Score across 6 domains — tracked over time.</p>
+        <button style="background:linear-gradient(135deg,var(--a1),#00d488);color:#000;border:none;border-radius:12px;padding:14px 30px;font-family:'Cabinet Grotesk',sans-serif;font-size:15px;font-weight:800;cursor:pointer;" onclick="openPayment('pro')">⚡ Upgrade to Pro →</button>
+      </div>`;return;
+  }
+
+  const totalScore=calcScore();
+  const scoreLabel=totalScore>=80?'Thriving':totalScore>=60?'Growing':totalScore>=40?'Building':'Starting';
+
+  const circumference=2*Math.PI*54;
+  const offset=circumference-(totalScore/100)*circumference;
+
+  document.getElementById('scorePage').innerHTML=`
+    <div class="score-hero">
+      <div class="score-ring-wrap">
+        <svg width="140" height="140" viewBox="0 0 140 140">
+          <circle cx="70" cy="70" r="54" fill="none" stroke="rgba(123,255,207,0.08)" stroke-width="10"/>
+          <circle cx="70" cy="70" r="54" fill="none" stroke="url(#sg)" stroke-width="10"
+            stroke-dasharray="${circumference}" stroke-dashoffset="${offset}"
+            stroke-linecap="round" transform="rotate(-90 70 70)" style="transition:stroke-dashoffset 1s ease;"/>
+          <defs><linearGradient id="sg" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#7fffcf"/><stop offset="100%" stop-color="#3b9eff"/></linearGradient></defs>
+        </svg>
+        <div class="score-num">${totalScore||'—'}</div>
+      </div>
+      <div class="score-label-main">${scoreLabel} 🌱</div>
+      <p class="score-sub">Your score grows as you ask questions and apply advice. Keep going.</p>
+    </div>
+    <div class="radar-grid">
+      ${SCORE_DOMAINS.map(d=>{
+        const val=CU.scores?.[d.key]||0;
+        return `<div class="rg-card">
+          <div class="rg-icon">${d.icon}</div>
+          <div class="rg-name">${d.label}</div>
+          <div class="rg-bar"><div class="rg-fill" style="width:${val}%;background:${d.color};"></div></div>
+          <div class="rg-val" style="color:${d.color}">${val||'—'}</div>
+        </div>`;
+      }).join('')}
+    </div>
+    <div class="score-cta">
+      <div class="sc-cta-text">
+        <h4>Improve your score</h4>
+        <p>Ask Velo about your lowest domains to get targeted advice.</p>
+      </div>
+      <button class="sc-cta-btn" onclick="showPg('ask')">Ask Velo →</button>
+    </div>`;
+}
+
+// ─── HISTORY ───
+function renderHistPage(){
+  const h=CU?.history||[];
+  const el=document.getElementById('histList');
+  if(!h.length){el.innerHTML='<div style="text-align:center;padding:60px 20px;color:var(--muted2);">No history yet — start asking!</div>';return;}
+  el.innerHTML=h.map((e,i)=>`
+    <div class="h-item" onclick="viewHistEntry(${i})">
+      <div class="h-ic">${e.icon}</div>
+      <div style="flex:1;min-width:0;">
+        <div class="h-q">${e.q.length>85?e.q.slice(0,82)+'…':e.q}</div>
+        <div class="h-c">${e.cat}${e.date?' · '+e.date:''}${e.tone?' · '+TONE_LABELS[e.tone]:''}</div>
+      </div>
+      <div class="h-t">${e.time}</div>
+    </div>`).join('');
+}
+
+function viewHistEntry(i){
+  const e=CU.history[i];
+  showPg('ask');
+  showResp(fmt(e.full),e,e.followups||[]);
+  document.getElementById('respArea').scrollIntoView({behavior:'smooth'});
+}
+
+// ─── SETTINGS ───
+function renderSettings(){
+  if(!CU)return;
+  document.getElementById('stName').textContent=CU.name;
+  document.getElementById('stEmail').textContent=CU.email;
+  document.getElementById('stJoined').textContent=CU.joined||'—';
+  const p=CU.plan||'free';
+  document.getElementById('stPlan').innerHTML=`<span class="tp tp-${p}">${PLANS[p].label}</span>`;
+  document.getElementById('stUsage').textContent=`${getUsed()} / ${PLANS[p].daily===Infinity?'∞':PLANS[p].daily}`;
+  document.getElementById('stHistCnt').textContent=`${(CU.history||[]).length} questions`;
+  document.getElementById('stStreak').textContent=`🔥 ${CU.streak||0} days`;
+  if(CU.prefs?.tone)document.getElementById('prefTone').value=CU.prefs.tone;
+  const pa=document.getElementById('planActions');
+  if(p==='free')pa.innerHTML=`<button class="nbtn nbtn-solid" onclick="openPayment('pro')">⚡ Upgrade to Pro — $9/mo</button><button class="btn-acc" onclick="openPayment('elite')">✦ Get Elite — $19/mo</button>`;
+  else if(p==='pro')pa.innerHTML=`<button class="btn-acc" onclick="openPayment('elite')">✦ Upgrade to Elite</button><button class="btn-danger" onclick="downgradePlan()">Downgrade to Free</button>`;
+  else pa.innerHTML=`<button class="btn-danger" onclick="downgradePlan()">Downgrade to Free</button>`;
+}
+async function savePref(){
+  CU.prefs=CU.prefs||{};
+  CU.prefs.tone=document.getElementById('prefTone').value;
+  await DB.set('velo_u_'+CU.id,CU);
+  if(document.getElementById('toneSelect'))document.getElementById('toneSelect').value=CU.prefs.tone;
+  showToast('Preferences saved.');
+}
+async function clearHist(){
+  if(!confirm('Clear all history?'))return;
+  CU.history=[];CU.scores={};
+  await DB.set('velo_u_'+CU.id,CU);
+  renderSettings();updateSB();showToast('History cleared.');
+}
+async function downgradePlan(){
+  if(!confirm('Downgrade to Free plan?'))return;
+  CU.plan='free';await DB.set('velo_u_'+CU.id,CU);updateSB();renderSettings();updateMeter();showToast('Downgraded to Free.');
+}
+
+// ─── PAYMENT ───
+function openPayment(plan){
+  selPlan=plan;
+  document.getElementById('payOverlay').classList.add('open');
+  renderPayBody();
+}
+function closePay(){document.getElementById('payOverlay').classList.remove('open');}
+function renderPayBody(){
+  const isE=selPlan==='elite';
+  const price=isAnnual?(isE?13:6):(isE?19:9);
+  const nm=isE?'Elite ✦':'Pro ⚡';
+  document.getElementById('payTitle').textContent='Upgrade to '+nm;
+  document.getElementById('payBody').innerHTML=`
+    <div class="plan-preview">
+      <div class="pp-name">${nm}</div>
+      <div class="pp-price ${isE?'gold-p':''}"><sup>$</sup>${price}<sub>/month${isAnnual?' · billed annually':''}</sub></div>
+    </div>
+    <div class="err-box" id="payErr"></div>
+    <div class="fg"><label class="fl">Cardholder Name</label><input class="fi" id="pName" type="text" placeholder="Jane Smith" value="${CU?CU.name:''}"/></div>
+    <div class="fg"><label class="fl">Card Number</label><input class="fi" id="pCard" type="text" placeholder="4242 4242 4242 4242" maxlength="19" oninput="this.value=this.value.replace(/\D/g,'').replace(/(.{4})/g,'$1 ').trim().slice(0,19)"/></div>
+    <div class="card-row">
+      <div class="fg"><label class="fl">Expiry</label><input class="fi" id="pExp" type="text" placeholder="MM/YY" maxlength="5" oninput="let v=this.value.replace(/\D/g,'');if(v.length>=2)v=v.slice(0,2)+'/'+v.slice(2);this.value=v;"/></div>
+      <div class="fg"><label class="fl">CVV</label><input class="fi" id="pCvv" type="text" placeholder="123" maxlength="4"/></div>
+    </div>
+    <button class="btn-sub" onclick="processPay()">Pay $${price}/mo →</button>
+    <div class="pay-secure">🔒 256-bit SSL encrypted · <span>Cancel anytime</span></div>`;
+}
+async function processPay(){
+  const card=document.getElementById('pCard').value.replace(/\s/g,'');
+  const exp=document.getElementById('pExp').value;
+  const cvv=document.getElementById('pCvv').value;
+  const name=document.getElementById('pName').value.trim();
+  const errEl=document.getElementById('payErr');errEl.style.display='none';
+  if(!name){errEl.textContent='Enter cardholder name.';errEl.style.display='block';return;}
+  if(card.length<16){errEl.textContent='Enter a valid 16-digit card number.';errEl.style.display='block';return;}
+  if(!exp.match(/^\d{2}\/\d{2}$/)){errEl.textContent='Enter expiry as MM/YY.';errEl.style.display='block';return;}
+  if(cvv.length<3){errEl.textContent='Enter a valid CVV.';errEl.style.display='block';return;}
+  const btn=document.querySelector('#payBody .btn-sub');btn.disabled=true;btn.textContent='Processing…';
+  await new Promise(r=>setTimeout(r,1800));
+  CU.plan=selPlan;
+  await DB.set('velo_u_'+CU.id,CU);
+  document.getElementById('payBody').innerHTML=`
+    <div class="success-wrap">
+      <div class="sw-icon">🎉</div>
+      <h3>You're on ${PLANS[selPlan].label}!</h3>
+      <p>All features unlocked. Welcome to the full Velo experience.</p>
+      <button class="btn-sub" style="margin-top:24px;" onclick="closePay();updateSB();updateMeter();renderBriefing();">Start Using Velo →</button>
+    </div>`;
+  showToast(`🎉 Upgraded to ${PLANS[selPlan].label}!`);
+}
+
+// ─── UTILS ───
+function showToast(msg){
+  const t=document.getElementById('toast');
+  document.getElementById('tMsg').textContent=msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3200);
+}
+
+document.addEventListener('keydown',e=>{
+  if((e.ctrlKey||e.metaKey)&&e.key==='Enter'&&document.getElementById('app-page').classList.contains('active'))doAsk();
+});
+
+init();
+</script>
+</body>
+</html>
